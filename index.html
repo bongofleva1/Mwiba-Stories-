@@ -605,3 +605,25 @@ function deleteStory(id){
 }
 
 function clearForm(){
+ editingId=null;
+ uploadedImages=[];
+ uploadInProgress=false;
+
+ document.getElementById("storyTitle").value="";
+ document.getElementById("storyCategory").value="mapenzi";
+ document.getElementById("storyDescription").value="";
+ document.getElementById("storyContent").value="";
+ document.getElementById("previewGrid").innerHTML="";
+ document.getElementById("uploadStatus").textContent="Bado hujachagua picha.";
+
+ document.getElementById("formTitle").textContent="Ongeza simulizi jipya";
+ document.getElementById("cancelEdit").classList.add("hidden");
+}
+
+function cancelEditing(){
+ clearForm();
+ document.getElementById("adminStatus").textContent="";
+}
+</script>
+</body>
+</html>
