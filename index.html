@@ -1,243 +1,66 @@
-
 <!DOCTYPE html>
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111111">
-<meta name="description" content="Mwiba Stories - Soma simulizi, hadithi na visa mbalimbali kwa njia ya picha.">
-<title>Mwiba Stories | Hadithi kwa Picha</title>
+<meta name="description" content="Mwiba Stories - Simulizi na hadithi kwa picha.">
+<title>MWIBA STORIES</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #111;
-  color: #fff;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  background: #191919;
-  padding: 18px 5%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #333;
-}
-
-.logo {
-  color: #e4b84e;
-  font-size: 23px;
-  font-weight: bold;
-}
-
-.logo span {
-  color: white;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 15px;
-  font-size: 13px;
-}
-
-.hero {
-  padding: 55px 20px;
-  text-align: center;
-  background: linear-gradient(135deg, #242016, #111);
-}
-
-.hero h1 {
-  font-size: 32px;
-  margin-bottom: 12px;
-  color: #e4b84e;
-}
-
-.hero p {
-  color: #ccc;
-  line-height: 1.7;
-  font-size: 14px;
-}
-
-.search {
-  max-width: 450px;
-  margin: 22px auto 0;
-  display: flex;
-}
-
-.search input {
-  flex: 1;
-  padding: 13px;
-  border: none;
-  border-radius: 6px 0 0 6px;
-  outline: none;
-}
-
-.search button {
-  padding: 13px 18px;
-  background: #e4b84e;
-  border: none;
-  border-radius: 0 6px 6px 0;
-  font-weight: bold;
-}
-
-.container {
-  padding: 25px 5%;
-  max-width: 1200px;
-  margin: auto;
-}
-
-.section-title {
-  color: #e4b84e;
-  font-size: 21px;
-  margin-bottom: 18px;
-}
-
-.categories {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 20px;
-}
-
-.category {
-  background: #252525;
-  color: white;
-  border: 1px solid #444;
-  padding: 10px 17px;
-  border-radius: 20px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.category.active,
-.category:hover {
-  background: #e4b84e;
-  color: #111;
-}
-
-.stories {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.story {
-  background: #202020;
-  border-radius: 9px;
-  overflow: hidden;
-  border: 1px solid #333;
-}
-
-.cover {
-  height: 180px;
-  background: linear-gradient(135deg, #473718, #171717);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #e4b84e;
-  font-size: 35px;
-}
-
-.story-content {
-  padding: 15px;
-}
-
-.story-content h3 {
-  font-size: 16px;
-  margin-bottom: 9px;
-}
-
-.story-content p {
-  color: #aaa;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.read {
-  display: inline-block;
-  margin-top: 14px;
-  background: #e4b84e;
-  color: #111;
-  text-decoration: none;
-  padding: 9px 15px;
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.ad-slot {
-  margin: 25px 0;
-  min-height: 90px;
-  border: 1px dashed #555;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #777;
-  font-size: 12px;
-  text-align: center;
-}
-
-.empty {
-  color: #aaa;
-  padding: 25px 0;
-  display: none;
-}
-
-footer {
-  background: #191919;
-  text-align: center;
-  padding: 25px 15px;
-  margin-top: 40px;
-  color: #aaa;
-  font-size: 13px;
-  line-height: 2;
-}
-
-footer strong {
-  color: #e4b84e;
-}
-
-@media(max-width: 650px) {
-  header {
-    padding: 16px 4%;
-  }
-
-  nav a {
-    margin-left: 8px;
-    font-size: 12px;
-  }
-
-  .logo {
-    font-size: 19px;
-  }
-
-  .hero h1 {
-    font-size: 27px;
-  }
-
-  .stories {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .cover {
-    height: 135px;
-  }
-
-  .story-content {
-    padding: 11px;
-  }
-
-  .story-content h3 {
-    font-size: 14px;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#111;color:white;font-family:Arial,sans-serif}
+header{background:#191919;padding:17px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333}
+.logo{color:#e4b84e;font-size:22px;font-weight:bold}
+.logo span{color:white}
+button{cursor:pointer}
+nav button{background:none;border:0;color:white;margin-left:12px}
+.hero{text-align:center;padding:45px 15px;background:linear-gradient(135deg,#302719,#111)}
+.hero h1{color:#e4b84e;margin-bottom:12px}
+.hero p{color:#ccc;line-height:1.7;font-size:14px}
+.search{display:flex;max-width:450px;margin:20px auto}
+.search input{flex:1;min-width:0;padding:13px;border:0;border-radius:5px 0 0 5px}
+.search button,.gold{background:#e4b84e;color:#111;border:0;padding:12px 17px;border-radius:5px;font-weight:bold}
+.search button{border-radius:0 5px 5px 0}
+.container{max-width:1150px;margin:auto;padding:25px 5%}
+.section-title{color:#e4b84e;margin-bottom:16px;font-size:21px}
+.categories{display:flex;gap:9px;overflow-x:auto;padding-bottom:20px}
+.category{background:#252525;color:white;border:1px solid #444;padding:10px 16px;border-radius:20px;white-space:nowrap}
+.category.active{background:#e4b84e;color:#111}
+.stories{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+.story{background:#202020;border:1px solid #333;border-radius:9px;overflow:hidden}
+.cover{height:180px;background:#292319;display:flex;align-items:center;justify-content:center;color:#e4b84e}
+.cover img{width:100%;height:100%;object-fit:cover}
+.story-content{padding:14px}
+.story-content h3{font-size:16px;margin-bottom:8px}
+.story-content p{font-size:13px;color:#aaa;line-height:1.6}
+.read{display:inline-block;margin-top:13px;background:#e4b84e;color:#111;padding:9px 14px;border-radius:5px;text-decoration:none;font-weight:bold;font-size:13px;border:0}
+.ad-slot{margin:25px 0;min-height:80px;border:1px dashed #555;display:flex;align-items:center;justify-content:center;color:#777;font-size:12px}
+.empty{display:none;color:#aaa;padding:25px 0}
+footer{background:#191919;text-align:center;padding:25px;color:#aaa;font-size:13px;line-height:2;margin-top:35px}
+footer strong{color:#e4b84e}
+.panel{background:#202020;border:1px solid #444;border-radius:9px;padding:18px;margin:20px 0}
+.panel h2{color:#e4b84e;margin-bottom:15px}
+.field{width:100%;padding:12px;margin:7px 0 13px;border-radius:5px;border:1px solid #555;background:#151515;color:white}
+textarea.field{min-height:130px;resize:vertical}
+label{font-size:13px;color:#ddd}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.danger{background:#a52b2b;color:white;border:0;padding:9px 13px;border-radius:5px}
+.secondary{background:#444;color:white;border:0;padding:9px 13px;border-radius:5px}
+#reader{display:none;background:#202020;border:1px solid #444;border-radius:8px;padding:18px;margin:20px 0}
+#reader h2{color:#e4b84e;margin:15px 0}
+#reader img{width:100%;max-height:400px;object-fit:contain;margin:12px 0}
+#readerText{white-space:pre-wrap;line-height:1.8;color:#ddd}
+.status{font-size:13px;color:#e4b84e;margin:8px 0}
+.hidden{display:none!important}
+@media(max-width:650px){
+ .stories{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .cover{height:135px}
+ .story-content{padding:10px}
+ .story-content h3{font-size:14px}
+ .logo{font-size:18px}
+ header{padding:15px 4%}
+ nav button{font-size:12px;margin-left:5px}
 }
 </style>
 </head>
@@ -245,139 +68,370 @@ footer strong {
 <body>
 
 <header>
-  <div class="logo">MWIBA <span>STORIES</span></div>
-  <nav>
-    <a href="#">Nyumbani</a>
-    <a href="#stories">Story</a>
-  </nav>
+ <div class="logo">MWIBA <span>STORIES</span></div>
+ <nav>
+  <button onclick="goHome()">Nyumbani</button>
+  <button onclick="showLogin()">Admin</button>
+ </nav>
 </header>
 
-<section class="hero">
-  <h1>Karibu Mwiba Stories</h1>
-  <p>
-    Hadithi, simulizi na visa mbalimbali.<br>
-    Soma story zako uzipendazo kupitia picha.
-  </p>
-
-  <div class="search">
-    <input type="text" id="searchInput"
-    placeholder="Tafuta story...">
-    <button onclick="searchStories()">Tafuta</button>
-  </div>
+<section class="hero" id="home">
+ <h1>Karibu Mwiba Stories</h1>
+ <p>Hadithi, simulizi na visa mbalimbali.<br>Soma story zako uzipendazo kupitia picha.</p>
+ <div class="search">
+  <input id="searchInput" placeholder="Tafuta story...">
+  <button onclick="searchStories()">Tafuta</button>
+ </div>
 </section>
 
-<div class="container">
+<main class="container">
 
-  <h2 class="section-title">Chagua aina ya story</h2>
+ <div id="loginPanel" class="panel hidden">
+  <h2>Admin Login</h2>
+  <label>Email</label>
+  <input class="field" type="email" id="adminEmail" placeholder="Email yako">
+  <label>Password</label>
+  <input class="field" type="password" id="adminPassword" placeholder="Password yako">
+  <button class="gold" onclick="loginAdmin()">Ingia</button>
+  <button class="secondary" onclick="hideLogin()">Funga</button>
+  <p class="status" id="loginStatus"></p>
+ </div>
 
-  <div class="categories">
-    <button class="category active" onclick="filterStories('zote',this)">Zote</button>
-    <button class="category" onclick="filterStories('mapenzi',this)">Mapenzi</button>
-    <button class="category" onclick="filterStories('maisha',this)">Maisha</button>
-    <button class="category" onclick="filterStories('vituko',this)">Vituko</button>
-    <button class="category" onclick="filterStories('kusisimua',this)">Kusisimua</button>
-  </div>
+ <div id="adminPanel" class="panel hidden">
+  <h2>MWIBA STORIES - ADMIN</h2>
+  <p class="status">Umeingia kama Admin.</p>
 
-  <!-- Nafasi ya tangazo la Adsterra -->
+  <h3 id="formTitle">Ongeza simulizi jipya</h3>
 
-  <div class="ad-slot">
-    Nafasi ya tangazo
-  </div>
+  <label>Kichwa cha simulizi</label>
+  <input class="field" id="storyTitle" placeholder="Andika kichwa">
 
-  <h2 class="section-title" id="stories">Story mpya</h2>
+  <label>Aina ya simulizi</label>
+  <select class="field" id="storyCategory">
+   <option value="mapenzi">Mapenzi</option>
+   <option value="maisha">Maisha</option>
+   <option value="vituko">Vituko</option>
+   <option value="kusisimua">Kusisimua</option>
+  </select>
 
-  <div class="stories" id="storiesContainer">
+  <label>Maelezo mafupi</label>
+  <textarea class="field" id="storyDescription" placeholder="Utangulizi wa simulizi"></textarea>
 
-    <article class="story" data-category="mapenzi">
-      <div class="cover">♥</div>
-      <div class="story-content">
-        <h3>Story ya Mapenzi</h3>
-        <p>Simulizi za mapenzi na maisha.</p>
-        <a href="#" class="read">Soma story</a>
-      </div>
-    </article>
+  <label>Link ya picha ya GitHub</label>
+  <input class="field" id="storyImage" placeholder="https://...">
 
-    <article class="story" data-category="maisha">
-      <div class="cover">✦</div>
-      <div class="story-content">
-        <h3>Safari ya Maisha</h3>
-        <p>Visa vinavyofundisha kuhusu maisha.</p>
-        <a href="#" class="read">Soma story</a>
-      </div>
-    </article>
+  <label>Simulizi lote</label>
+  <textarea class="field" id="storyContent" placeholder="Andika simulizi lote hapa..."></textarea>
 
-    <article class="story" data-category="kusisimua">
-      <div class="cover">★</div>
-      <div class="story-content">
-        <h3>Simulizi za Kusisimua</h3>
-        <p>Hadithi zenye matukio ya kusisimua.</p>
-        <a href="#" class="read">Soma story</a>
-      </div>
-    </article>
+  <button class="gold" onclick="saveStory()">Hifadhi simulizi</button>
+  <button class="secondary hidden" id="cancelEdit" onclick="cancelEditing()">Ghairi kuhariri</button>
+  <button class="danger" onclick="logoutAdmin()">Toka Admin</button>
+  <p class="status" id="adminStatus"></p>
+ </div>
 
-  </div>
+ <h2 class="section-title">Chagua aina ya story</h2>
+ <div class="categories">
+  <button class="category active" onclick="filterStories('zote',this)">Zote</button>
+  <button class="category" onclick="filterStories('mapenzi',this)">Mapenzi</button>
+  <button class="category" onclick="filterStories('maisha',this)">Maisha</button>
+  <button class="category" onclick="filterStories('vituko',this)">Vituko</button>
+  <button class="category" onclick="filterStories('kusisimua',this)">Kusisimua</button>
+ </div>
 
-  <p class="empty" id="emptyMessage">
-    Hakuna story iliyopatikana.
-  </p>
+ <div class="ad-slot">Nafasi ya tangazo</div>
 
-  <!-- Nafasi nyingine ya Adsterra -->
+ <h2 class="section-title" id="stories">Story mpya</h2>
+ <div class="stories" id="storiesContainer"></div>
+ <p class="empty" id="emptyMessage">Hakuna story iliyopatikana.</p>
 
-  <div class="ad-slot">
-    Nafasi ya tangazo
-  </div>
+ <section id="reader">
+  <button class="secondary" onclick="closeReader()">← Rudi kwenye simulizi</button>
+  <h2 id="readerTitle"></h2>
+  <img id="readerImage" alt="Picha ya simulizi">
+  <p id="readerDescription" style="color:#aaa;margin-bottom:15px"></p>
+  <div id="readerText"></div>
+ </section>
 
-</div>
+ <div class="ad-slot">Nafasi ya tangazo</div>
+</main>
 
 <footer>
-  <strong>MWIBA STORIES</strong><br>
-  Hadithi kwa njia ya picha.<br>
-  © 2026 Mwiba Stories. Haki zote zimehifadhiwa.
+ <strong>MWIBA STORIES</strong><br>
+ Hadithi kwa njia ya picha.<br>
+ © 2026 Mwiba Stories. Haki zote zimehifadhiwa.
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
-function filterStories(category, button) {
-  document.querySelectorAll('.category').forEach(btn => {
-    btn.classList.remove('active');
-  });
+// FIREBASE CONFIGURATION
+const firebaseConfig = {
+ apiKey: "AIzaSyCXwx1a14XIXsLkUkUgEUYuCJqS9x3uKLs",
+ authDomain: "mwiba-stories.firebaseapp.com",
+ projectId: "mwiba-stories",
+ storageBucket: "mwiba-stories.firebasestorage.app",
+ messagingSenderId: "532859748570",
+ appId: "1:532859748570:web:0243dbce910f16e54525e3"
+};
 
-  button.classList.add('active');
+firebase.initializeApp(firebaseConfig);
 
-  document.querySelectorAll('.story').forEach(story => {
-    story.style.display =
-      category === 'zote' ||
-      story.dataset.category === category
-      ? '' : 'none';
-  });
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  checkEmpty();
+const ADMIN_UID = "69WXPvG20zRdrWGKU4KS7CdhD6C2";
+
+let stories = [];
+let editingId = null;
+let currentCategory = "zote";
+let currentSearch = "";
+
+function showLogin(){
+ document.getElementById("loginPanel").classList.remove("hidden");
+}
+function hideLogin(){
+ document.getElementById("loginPanel").classList.add("hidden");
+}
+function goHome(){
+ closeReader();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function loginAdmin(){
+ const email=document.getElementById("adminEmail").value.trim();
+ const password=document.getElementById("adminPassword").value;
+ const status=document.getElementById("loginStatus");
+
+ if(!email || !password){
+  status.textContent="Jaza email na password.";
+  return;
+ }
+
+ auth.signInWithEmailAndPassword(email,password)
+ .then(()=>{
+  status.textContent="Umeingia kikamilifu.";
+ })
+ .catch(error=>{
+  status.textContent="Imeshindikana kuingia: "+error.message;
+ });
 }
 
-function searchStories() {
-  const query = document.getElementById('searchInput')
-    .value.toLowerCase();
-
-  document.querySelectorAll('.category').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  document.querySelectorAll('.story').forEach(story => {
-    const title = story.innerText.toLowerCase();
-    story.style.display = title.includes(query) ? '' : 'none';
-  });
-
-  checkEmpty();
+function logoutAdmin(){
+ auth.signOut();
+ cancelEditing();
 }
 
-function checkEmpty() {
-  const visible = [...document.querySelectorAll('.story')]
-    .some(story => story.style.display !== 'none');
+auth.onAuthStateChanged(user=>{
+ const isAdmin=user && user.uid===ADMIN_UID;
+ document.getElementById("adminPanel").classList.toggle("hidden",!isAdmin);
+ document.getElementById("loginPanel").classList.add("hidden");
 
-  document.getElementById('emptyMessage').style.display =
-    visible ? 'none' : 'block';
+ if(user && !isAdmin){
+  auth.signOut();
+  document.getElementById("loginStatus").textContent="Akaunti hii haina ruhusa ya Admin.";
+ }
+});
+
+// Kupokea simulizi kutoka Firestore
+db.collection("stories").orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+ stories=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+ renderStories();
+},error=>{
+ document.getElementById("emptyMessage").style.display="block";
+ document.getElementById("emptyMessage").textContent="Imeshindikana kupakia simulizi. "+error.message;
+});
+
+function renderStories(){
+ const container=document.getElementById("storiesContainer");
+ container.innerHTML="";
+
+ const filtered=stories.filter(story=>{
+  const categoryOK=currentCategory==="zote" || story.category===currentCategory;
+  const searchText=(story.title+" "+story.description).toLowerCase();
+  const searchOK=searchText.includes(currentSearch);
+  return categoryOK && searchOK;
+ });
+
+ filtered.forEach(story=>{
+  const article=document.createElement("article");
+  article.className="story";
+
+  const cover=document.createElement("div");
+  cover.className="cover";
+
+  if(story.imageUrl){
+   const img=document.createElement("img");
+   img.src=story.imageUrl;
+   img.alt=story.title || "Picha ya simulizi";
+   img.onerror=()=>{img.remove();cover.textContent="MWIBA";};
+   cover.appendChild(img);
+  }else{
+   cover.textContent="MWIBA";
+  }
+
+  const content=document.createElement("div");
+  content.className="story-content";
+
+  const title=document.createElement("h3");
+  title.textContent=story.title || "Simulizi";
+
+  const description=document.createElement("p");
+  description.textContent=story.description || "";
+
+  const read=document.createElement("button");
+  read.className="read";
+  read.textContent="Soma story";
+  read.onclick=()=>openReader(story.id);
+
+  content.append(title,description,read);
+
+  if(auth.currentUser && auth.currentUser.uid===ADMIN_UID){
+   const actions=document.createElement("div");
+   actions.className="admin-actions";
+
+   const edit=document.createElement("button");
+   edit.className="secondary";
+   edit.textContent="Hariri";
+   edit.onclick=()=>editStory(story.id);
+
+   const del=document.createElement("button");
+   del.className="danger";
+   del.textContent="Futa";
+   del.onclick=()=>deleteStory(story.id);
+
+   actions.append(edit,del);
+   content.appendChild(actions);
+  }
+
+  article.append(cover,content);
+  container.appendChild(article);
+ });
+
+ document.getElementById("emptyMessage").style.display=filtered.length?"none":"block";
+}
+
+function filterStories(category,button){
+ currentCategory=category;
+ document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+ renderStories();
+}
+
+function searchStories(){
+ currentSearch=document.getElementById("searchInput").value.trim().toLowerCase();
+ renderStories();
+}
+
+document.getElementById("searchInput").addEventListener("input",searchStories);
+
+function openReader(id){
+ const story=stories.find(s=>s.id===id);
+ if(!story)return;
+
+ document.getElementById("readerTitle").textContent=story.title || "";
+ document.getElementById("readerDescription").textContent=story.description || "";
+ document.getElementById("readerText").textContent=story.content || "";
+
+ const img=document.getElementById("readerImage");
+ img.src=story.imageUrl || "";
+ img.style.display=story.imageUrl?"block":"none";
+
+ document.getElementById("reader").style.display="block";
+ document.getElementById("reader").scrollIntoView({behavior:"smooth"});
+}
+
+function closeReader(){
+ document.getElementById("reader").style.display="none";
+}
+
+function saveStory(){
+ const user=auth.currentUser;
+ const status=document.getElementById("adminStatus");
+
+ if(!user || user.uid!==ADMIN_UID){
+  status.textContent="Huna ruhusa ya kufanya kitendo hiki.";
+  return;
+ }
+
+ const title=document.getElementById("storyTitle").value.trim();
+ const category=document.getElementById("storyCategory").value;
+ const description=document.getElementById("storyDescription").value.trim();
+ const imageUrl=document.getElementById("storyImage").value.trim();
+ const content=document.getElementById("storyContent").value.trim();
+
+ if(!title || !content){
+  status.textContent="Jaza kichwa na simulizi lote.";
+  return;
+ }
+
+ if(imageUrl && !/^https:\/\/.+/i.test(imageUrl)){
+  status.textContent="Link ya picha lazima ianze na https://";
+  return;
+ }
+
+ const data={
+  title,category,description,imageUrl,content
+ };
+
+ let operation;
+
+ if(editingId){
+  operation=db.collection("stories").doc(editingId).update(data);
+ }else{
+  data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+  operation=db.collection("stories").add(data);
+ }
+
+ status.textContent="Inahifadhi...";
+
+ operation.then(()=>{
+  status.textContent="Simulizi limehifadhiwa kikamilifu!";
+  clearForm();
+ }).catch(error=>{
+  status.textContent="Hitilafu: "+error.message;
+ });
+}
+
+function editStory(id){
+ const story=stories.find(s=>s.id===id);
+ if(!story)return;
+
+ editingId=id;
+ document.getElementById("storyTitle").value=story.title || "";
+ document.getElementById("storyCategory").value=story.category || "maisha";
+ document.getElementById("storyDescription").value=story.description || "";
+ document.getElementById("storyImage").value=story.imageUrl || "";
+ document.getElementById("storyContent").value=story.content || "";
+ document.getElementById("formTitle").textContent="Hariri simulizi";
+ document.getElementById("cancelEdit").classList.remove("hidden");
+ document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function deleteStory(id){
+ if(!confirm("Una uhakika unataka kufuta simulizi hili?"))return;
+
+ db.collection("stories").doc(id).delete()
+ .then(()=>alert("Simulizi limefutwa."))
+ .catch(error=>alert("Imeshindikana: "+error.message));
+}
+
+function clearForm(){
+ editingId=null;
+ document.getElementById("storyTitle").value="";
+ document.getElementById("storyCategory").value="mapenzi";
+ document.getElementById("storyDescription").value="";
+ document.getElementById("storyImage").value="";
+ document.getElementById("storyContent").value="";
+ document.getElementById("formTitle").textContent="Ongeza simulizi jipya";
+ document.getElementById("cancelEdit").classList.add("hidden");
+}
+
+function cancelEditing(){
+ clearForm();
+ document.getElementById("adminStatus").textContent="";
 }
 </script>
-
 </body>
-  </html>
-  
+</html>
