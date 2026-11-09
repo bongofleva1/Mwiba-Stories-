@@ -42,17 +42,26 @@ footer strong{color:#e4b84e}
 .panel{background:#202020;border:1px solid #444;border-radius:9px;padding:18px;margin:20px 0}
 .panel h2{color:#e4b84e;margin-bottom:15px}
 .field{width:100%;padding:12px;margin:7px 0 13px;border-radius:5px;border:1px solid #555;background:#151515;color:white}
-textarea.field{min-height:130px;resize:vertical}
+textarea.field{min-height:100px;resize:vertical}
 label{font-size:13px;color:#ddd}
 .admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .danger{background:#a52b2b;color:white;border:0;padding:9px 13px;border-radius:5px}
 .secondary{background:#444;color:white;border:0;padding:9px 13px;border-radius:5px}
+.status{font-size:13px;color:#e4b84e;margin:8px 0;line-height:1.6}
+.hidden{display:none!important}
+.upload-area{background:#151515;border:1px dashed #b18a38;border-radius:8px;padding:16px;margin:8px 0 14px}
+.upload-area p{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:12px}
+#previewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
+.preview-item{position:relative;min-width:0}
+.preview-item img{width:100%;height:105px;object-fit:cover;border-radius:5px}
+.preview-item button{position:absolute;top:4px;right:4px;background:#a52b2b;color:white;border:0;border-radius:50%;width:25px;height:25px}
+.preview-item small{display:block;color:#ccc;font-size:11px;text-align:center}
 #reader{display:none;background:#202020;border:1px solid #444;border-radius:8px;padding:18px;margin:20px 0}
 #reader h2{color:#e4b84e;margin:15px 0}
-#reader img{width:100%;max-height:400px;object-fit:contain;margin:12px 0}
-#readerText{white-space:pre-wrap;line-height:1.8;color:#ddd}
-.status{font-size:13px;color:#e4b84e;margin:8px 0}
-.hidden{display:none!important}
+#readerText{white-space:pre-wrap;line-height:1.8;color:#ddd;margin:15px 0}
+.reader-images{display:flex;flex-direction:column;gap:12px;margin-top:15px}
+.reader-images img{width:100%;height:auto;max-height:none;object-fit:contain;background:#111;border-radius:5px}
+.reader-number{color:#e4b84e;font-size:12px;text-align:center;margin-top:-7px}
 @media(max-width:650px){
  .stories{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
  .cover{height:135px}
@@ -61,6 +70,7 @@ label{font-size:13px;color:#ddd}
  .logo{font-size:18px}
  header{padding:15px 4%}
  nav button{font-size:12px;margin-left:5px}
+ #previewGrid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -104,7 +114,7 @@ label{font-size:13px;color:#ddd}
   <h3 id="formTitle">Ongeza simulizi jipya</h3>
 
   <label>Kichwa cha simulizi</label>
-  <input class="field" id="storyTitle" placeholder="Andika kichwa">
+  <input class="field" id="storyTitle" placeholder="Mfano: Siri ya Mapenzi">
 
   <label>Aina ya simulizi</label>
   <select class="field" id="storyCategory">
@@ -117,13 +127,18 @@ label{font-size:13px;color:#ddd}
   <label>Maelezo mafupi</label>
   <textarea class="field" id="storyDescription" placeholder="Utangulizi wa simulizi"></textarea>
 
-  <label>Link ya picha ya GitHub</label>
-  <input class="field" id="storyImage" placeholder="https://...">
+  <label>Picha za simulizi / Episode</label>
+  <div class="upload-area">
+   <p>Chagua picha nyingi kutoka Gallery ya simu yako. Unaweza kuchagua hadi picha 30 kwa pamoja.</p>
+   <button class="gold" type="button" onclick="openImageUpload()">📷 Chagua Picha kutoka Gallery</button>
+   <p class="status" id="uploadStatus">Bado hujachagua picha.</p>
+   <div id="previewGrid"></div>
+  </div>
 
-  <label>Simulizi lote</label>
-  <textarea class="field" id="storyContent" placeholder="Andika simulizi lote hapa..."></textarea>
+  <label>Maandishi ya ziada (si lazima)</label>
+  <textarea class="field" id="storyContent" placeholder="Andika maandishi ya ziada hapa..."></textarea>
 
-  <button class="gold" onclick="saveStory()">Hifadhi simulizi</button>
+  <button class="gold" id="saveButton" onclick="saveStory()">Hifadhi simulizi</button>
   <button class="secondary hidden" id="cancelEdit" onclick="cancelEditing()">Ghairi kuhariri</button>
   <button class="danger" onclick="logoutAdmin()">Toka Admin</button>
   <p class="status" id="adminStatus"></p>
@@ -147,9 +162,9 @@ label{font-size:13px;color:#ddd}
  <section id="reader">
   <button class="secondary" onclick="closeReader()">← Rudi kwenye simulizi</button>
   <h2 id="readerTitle"></h2>
-  <img id="readerImage" alt="Picha ya simulizi">
   <p id="readerDescription" style="color:#aaa;margin-bottom:15px"></p>
   <div id="readerText"></div>
+  <div class="reader-images" id="readerImages"></div>
  </section>
 
  <div class="ad-slot">Nafasi ya tangazo</div>
@@ -164,6 +179,7 @@ label{font-size:13px;color:#ddd}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://upload-widget.cloudinary.com/latest/global/all.js"></script>
 
 <script>
 // FIREBASE CONFIGURATION
@@ -183,11 +199,123 @@ const db = firebase.firestore();
 
 const ADMIN_UID = "69WXPvG20zRdrWGKU4KS7CdhD6C2";
 
+// CLOUDINARY
+const CLOUD_NAME = "kvlhfvmd";
+const UPLOAD_PRESET = "mwiba_stories";
+
 let stories = [];
 let editingId = null;
 let currentCategory = "zote";
 let currentSearch = "";
+let uploadedImages = [];
+let uploadWidget = null;
+let uploadInProgress = false;
 
+// CLOUDINARY UPLOAD WIDGET
+function createUploadWidget(){
+ if(typeof cloudinary === "undefined"){
+  alert("Cloudinary haijapakia. Hakikisha una intaneti kisha jaribu tena.");
+  return;
+ }
+
+ uploadWidget = cloudinary.createUploadWidget({
+  cloudName: CLOUD_NAME,
+  uploadPreset: UPLOAD_PRESET,
+  sources: ["local"],
+  defaultSource: "local",
+  multiple: true,
+  maxFiles: 30,
+  resourceType: "image",
+  clientAllowedFormats: ["jpg","jpeg","png","webp"],
+  maxImageFileSize: 10000000,
+  showPoweredBy: false,
+  language: "en"
+ }, function(error,result){
+
+  if(error){
+   document.getElementById("uploadStatus").textContent =
+    "Hitilafu ya kupakia picha: "+(error.message || "Jaribu tena.");
+   return;
+  }
+
+  if(result && result.event === "upload-added"){
+   uploadInProgress = true;
+   document.getElementById("uploadStatus").textContent =
+    "Picha zinapakiwa... tafadhali subiri.";
+  }
+
+  if(result && result.event === "success"){
+   const info = result.info;
+
+   if(info && info.secure_url){
+    uploadedImages.push({
+     url: info.secure_url,
+     publicId: info.public_id || ""
+    });
+    renderPreviews();
+   }
+  }
+
+  if(result && result.event === "queues-end"){
+   uploadInProgress = false;
+   document.getElementById("uploadStatus").textContent =
+    "Imekamilika! Picha "+uploadedImages.length+" zimepakiwa.";
+  }
+ });
+}
+
+function openImageUpload(){
+ if(!auth.currentUser || auth.currentUser.uid !== ADMIN_UID){
+  alert("Ingia kama Admin kwanza.");
+  return;
+ }
+
+ if(!uploadWidget){
+  createUploadWidget();
+ }
+
+ if(uploadWidget){
+  uploadWidget.open();
+ }
+}
+
+function renderPreviews(){
+ const grid = document.getElementById("previewGrid");
+ grid.innerHTML = "";
+
+ uploadedImages.forEach((image,index)=>{
+  const item = document.createElement("div");
+  item.className = "preview-item";
+
+  const img = document.createElement("img");
+  img.src = image.url;
+  img.alt = "Picha "+(index+1);
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "×";
+  remove.title = "Ondoa picha kwenye simulizi";
+  remove.onclick = ()=>removeImage(index);
+
+  const number = document.createElement("small");
+  number.textContent = "Picha "+(index+1);
+
+  item.append(img,remove,number);
+  grid.appendChild(item);
+ });
+
+ document.getElementById("uploadStatus").textContent =
+  uploadedImages.length
+   ? "Picha "+uploadedImages.length+" zimechaguliwa."
+   : "Bado hujachagua picha.";
+}
+
+function removeImage(index){
+ uploadedImages.splice(index,1);
+ renderPreviews();
+}
+
+// LOGIN
 function showLogin(){
  document.getElementById("loginPanel").classList.remove("hidden");
 }
@@ -198,6 +326,7 @@ function goHome(){
  closeReader();
  window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function loginAdmin(){
  const email=document.getElementById("adminEmail").value.trim();
  const password=document.getElementById("adminPassword").value;
@@ -229,19 +358,34 @@ auth.onAuthStateChanged(user=>{
 
  if(user && !isAdmin){
   auth.signOut();
-  document.getElementById("loginStatus").textContent="Akaunti hii haina ruhusa ya Admin.";
+  document.getElementById("loginStatus").textContent=
+   "Akaunti hii haina ruhusa ya Admin.";
  }
 });
 
-// Kupokea simulizi kutoka Firestore
+// FIRESTORE
 db.collection("stories").orderBy("createdAt","desc")
 .onSnapshot(snapshot=>{
  stories=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
  renderStories();
 },error=>{
  document.getElementById("emptyMessage").style.display="block";
- document.getElementById("emptyMessage").textContent="Imeshindikana kupakia simulizi. "+error.message;
+ document.getElementById("emptyMessage").textContent=
+  "Imeshindikana kupakia simulizi. "+error.message;
 });
+
+function getStoryImages(story){
+ if(Array.isArray(story.images) && story.images.length){
+  return story.images;
+ }
+
+ // Kuonyesha picha za simulizi zilizowekwa kwa mfumo wa zamani
+ if(story.imageUrl){
+  return [{url:story.imageUrl,publicId:""}];
+ }
+
+ return [];
+}
 
 function renderStories(){
  const container=document.getElementById("storiesContainer");
@@ -249,7 +393,7 @@ function renderStories(){
 
  const filtered=stories.filter(story=>{
   const categoryOK=currentCategory==="zote" || story.category===currentCategory;
-  const searchText=(story.title+" "+story.description).toLowerCase();
+  const searchText=((story.title||"")+" "+(story.description||"")).toLowerCase();
   const searchOK=searchText.includes(currentSearch);
   return categoryOK && searchOK;
  });
@@ -261,9 +405,11 @@ function renderStories(){
   const cover=document.createElement("div");
   cover.className="cover";
 
-  if(story.imageUrl){
+  const images=getStoryImages(story);
+
+  if(images.length){
    const img=document.createElement("img");
-   img.src=story.imageUrl;
+   img.src=images[0].url;
    img.alt=story.title || "Picha ya simulizi";
    img.onerror=()=>{img.remove();cover.textContent="MWIBA";};
    cover.appendChild(img);
@@ -282,7 +428,7 @@ function renderStories(){
 
   const read=document.createElement("button");
   read.className="read";
-  read.textContent="Soma story";
+  read.textContent="Soma story ("+images.length+" picha)";
   read.onclick=()=>openReader(story.id);
 
   content.append(title,description,read);
@@ -309,7 +455,8 @@ function renderStories(){
   container.appendChild(article);
  });
 
- document.getElementById("emptyMessage").style.display=filtered.length?"none":"block";
+ document.getElementById("emptyMessage").style.display=
+  filtered.length?"none":"block";
 }
 
 function filterStories(category,button){
@@ -326,6 +473,7 @@ function searchStories(){
 
 document.getElementById("searchInput").addEventListener("input",searchStories);
 
+// READER
 function openReader(id){
  const story=stories.find(s=>s.id===id);
  if(!story)return;
@@ -334,9 +482,23 @@ function openReader(id){
  document.getElementById("readerDescription").textContent=story.description || "";
  document.getElementById("readerText").textContent=story.content || "";
 
- const img=document.getElementById("readerImage");
- img.src=story.imageUrl || "";
- img.style.display=story.imageUrl?"block":"none";
+ const imageContainer=document.getElementById("readerImages");
+ imageContainer.innerHTML="";
+
+ const images=getStoryImages(story);
+
+ images.forEach((image,index)=>{
+  const img=document.createElement("img");
+  img.src=image.url;
+  img.alt="Picha "+(index+1)+" ya "+(story.title||"simulizi");
+  img.loading="lazy";
+
+  const number=document.createElement("p");
+  number.className="reader-number";
+  number.textContent="Picha "+(index+1)+" / "+images.length;
+
+  imageContainer.append(img,number);
+ });
 
  document.getElementById("reader").style.display="block";
  document.getElementById("reader").scrollIntoView({behavior:"smooth"});
@@ -346,33 +508,45 @@ function closeReader(){
  document.getElementById("reader").style.display="none";
 }
 
+// SAVE STORY
 function saveStory(){
  const user=auth.currentUser;
  const status=document.getElementById("adminStatus");
+ const saveButton=document.getElementById("saveButton");
 
  if(!user || user.uid!==ADMIN_UID){
   status.textContent="Huna ruhusa ya kufanya kitendo hiki.";
   return;
  }
 
- const title=document.getElementById("storyTitle").value.trim();
- const category=document.getElementById("storyCategory").value;
- const description=document.getElementById("storyDescription").value.trim();
- const imageUrl=document.getElementById("storyImage").value.trim();
- const content=document.getElementById("storyContent").value.trim();
-
- if(!title || !content){
-  status.textContent="Jaza kichwa na simulizi lote.";
+ if(uploadInProgress){
+  status.textContent="Subiri picha zote zikamilishe kupakiwa.";
   return;
  }
 
- if(imageUrl && !/^https:\/\/.+/i.test(imageUrl)){
-  status.textContent="Link ya picha lazima ianze na https://";
+ const title=document.getElementById("storyTitle").value.trim();
+ const category=document.getElementById("storyCategory").value;
+ const description=document.getElementById("storyDescription").value.trim();
+ const content=document.getElementById("storyContent").value.trim();
+
+ if(!title){
+  status.textContent="Andika kichwa cha simulizi.";
+  return;
+ }
+
+ if(uploadedImages.length===0 && !content){
+  status.textContent="Pakia angalau picha moja au andika simulizi.";
   return;
  }
 
  const data={
-  title,category,description,imageUrl,content
+  title,
+  category,
+  description,
+  content,
+  images:uploadedImages,
+  imageUrl:uploadedImages.length ? uploadedImages[0].url : "",
+  updatedAt:firebase.firestore.FieldValue.serverTimestamp()
  };
 
  let operation;
@@ -384,16 +558,22 @@ function saveStory(){
   operation=db.collection("stories").add(data);
  }
 
- status.textContent="Inahifadhi...";
+ saveButton.disabled=true;
+ saveButton.textContent="Inahifadhi...";
+ status.textContent="Inahifadhi simulizi...";
 
  operation.then(()=>{
   status.textContent="Simulizi limehifadhiwa kikamilifu!";
   clearForm();
  }).catch(error=>{
   status.textContent="Hitilafu: "+error.message;
+ }).finally(()=>{
+  saveButton.disabled=false;
+  saveButton.textContent="Hifadhi simulizi";
  });
 }
 
+// EDIT STORY
 function editStory(id){
  const story=stories.find(s=>s.id===id);
  if(!story)return;
@@ -402,8 +582,15 @@ function editStory(id){
  document.getElementById("storyTitle").value=story.title || "";
  document.getElementById("storyCategory").value=story.category || "maisha";
  document.getElementById("storyDescription").value=story.description || "";
- document.getElementById("storyImage").value=story.imageUrl || "";
  document.getElementById("storyContent").value=story.content || "";
+
+ uploadedImages=getStoryImages(story).map(image=>({
+  url:image.url,
+  publicId:image.publicId || ""
+ }));
+
+ renderPreviews();
+
  document.getElementById("formTitle").textContent="Hariri simulizi";
  document.getElementById("cancelEdit").classList.remove("hidden");
  document.getElementById("adminPanel").scrollIntoView({behavior:"smooth"});
@@ -418,20 +605,4 @@ function deleteStory(id){
 }
 
 function clearForm(){
- editingId=null;
- document.getElementById("storyTitle").value="";
- document.getElementById("storyCategory").value="mapenzi";
- document.getElementById("storyDescription").value="";
- document.getElementById("storyImage").value="";
- document.getElementById("storyContent").value="";
- document.getElementById("formTitle").textContent="Ongeza simulizi jipya";
- document.getElementById("cancelEdit").classList.add("hidden");
-}
-
-function cancelEditing(){
- clearForm();
- document.getElementById("adminStatus").textContent="";
-}
-</script>
-</body>
-</html>
+ 
