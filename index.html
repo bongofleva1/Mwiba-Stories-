@@ -64,6 +64,16 @@ label{font-size:13px;color:#ddd}
 .reader-images{display:flex;flex-direction:column;gap:12px;margin-top:15px}
 .reader-images img{width:100%;height:auto;max-height:none;object-fit:contain;background:#111;border-radius:5px}
 .reader-number{color:#e4b84e;font-size:12px;text-align:center;margin-top:-7px}
+.finish-area{border-top:1px solid #444;margin-top:25px;padding-top:20px;text-align:center}
+.finish-area p{color:#bbb;font-size:13px;line-height:1.6;margin-bottom:12px}
+.finish-button{background:#e4b84e;color:#111;border:0;border-radius:5px;padding:13px 20px;font-weight:bold}
+#adGate{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+#adGateBox{background:#202020;border:1px solid #b18a38;border-radius:12px;padding:25px 18px;text-align:center;width:100%;max-width:390px}
+#adGateBox h2{color:#e4b84e;margin-bottom:12px}
+#adGateBox p{color:#ddd;font-size:14px;line-height:1.7;margin:12px 0}
+#adCountdown{font-size:30px;color:#e4b84e;font-weight:bold;margin:15px}
+#adContinue{background:#e4b84e;color:#111;border:0;padding:13px 22px;border-radius:5px;font-weight:bold;width:100%}
+#adContinue:disabled{background:#555;color:#aaa;cursor:not-allowed}
 @media(max-width:650px){
  .stories{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
  .cover{height:135px}
@@ -116,7 +126,7 @@ label{font-size:13px;color:#ddd}
   <h3 id="formTitle">Ongeza simulizi jipya</h3>
 
   <label>Kichwa cha simulizi</label>
-  <input class="field" id="storyTitle" placeholder="Mfano: Siri ya Mapenzi">
+  <input class="field" id="storyTitle" placeholder="Mfano: Siri ya Mapenzi - Episode 1">
 
   <label>Aina ya simulizi</label>
   <select class="field" id="storyCategory">
@@ -156,7 +166,7 @@ label{font-size:13px;color:#ddd}
   <button class="category" onclick="filterStories('kusisimua',this)">Kusisimua</button>
  </div>
 
- <!-- ADSTERRA TANGAZO LA KWANZA -->
+ <!-- ADSTERRA BANNER -->
  <div class="ad-slot">
   <script>
    atOptions = {
@@ -180,9 +190,15 @@ label{font-size:13px;color:#ddd}
   <p id="readerDescription" style="color:#aaa;margin-bottom:15px"></p>
   <div id="readerText"></div>
   <div class="reader-images" id="readerImages"></div>
+
+  <div class="finish-area">
+   <p>Umemaliza kusoma episode hii? Bonyeza kitufe hapa chini.</p>
+   <button class="finish-button" onclick="finishEpisode()">Nimemaliza episode</button>
+   <p class="status" id="finishStatus"></p>
+  </div>
  </section>
 
- <!-- ADSTERRA TANGAZO LA PILI -->
+ <!-- BANNER YA PILI -->
  <div class="ad-slot">
   <script>
    atOptions = {
@@ -203,6 +219,18 @@ label{font-size:13px;color:#ddd}
  Hadithi kwa njia ya picha.<br>
  © 2026 Mwiba Stories. Haki zote zimehifadhiwa.
 </footer>
+
+<!-- KIZUIZI CHA TANGAZO -->
+<div id="adGate">
+ <div id="adGateBox">
+  <h2>MWIBA STORIES</h2>
+  <p>Asante kwa kusoma simulizi zetu!</p>
+  <p>Subiri sekunde chache kabla ya kuendelea na episode nyingine.</p>
+  <p>Tangazo linaweza kuonekana kwenye ukurasa huu.</p>
+  <div id="adCountdown">15</div>
+  <button id="adContinue" disabled onclick="continueAfterAd()">Subiri kidogo...</button>
+ </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -238,60 +266,192 @@ let currentSearch = "";
 let uploadedImages = [];
 let uploadWidget = null;
 let uploadInProgress = false;
+let currentStoryId = null;
+let pendingStoryId = null;
+let gateTimer = null;
+
+// MFUMO WA KUHESABU EPISODE ZILIZOSOMWA
+function getCompletedEpisodes(){
+ try{
+  return JSON.parse(localStorage.getItem("mwibaCompletedEpisodes") || "[]");
+ }catch(e){
+  return [];
+ }
+}
+
+function getLastGateCount(){
+ return Number(localStorage.getItem("mwibaLastGateCount") || 0);
+}
+
+function setLastGateCount(value){
+ localStorage.setItem("mwibaLastGateCount",String(value));
+}
+
+// KUONYESHA KIZUIZI CHA SEKUNDE 15
+function showAdGate(nextStoryId=null){
+
+ if(nextStoryId){
+  pendingStoryId=nextStoryId;
+ }
+
+ const gate=document.getElementById("adGate");
+ const button=document.getElementById("adContinue");
+
+ let gateUntil=Number(localStorage.getItem("mwibaGateUntil") || 0);
+
+ if(!gateUntil || gateUntil<Date.now()){
+  gateUntil=Date.now()+15000;
+  localStorage.setItem("mwibaGateUntil",String(gateUntil));
+ }
+
+ localStorage.setItem("mwibaGateActive","yes");
+
+ gate.style.display="flex";
+ button.disabled=true;
+ button.textContent="Subiri kidogo...";
+
+ if(gateTimer){
+  clearInterval(gateTimer);
+ }
+
+ function updateCountdown(){
+
+  const remaining=Math.max(0,Math.ceil((gateUntil-Date.now())/1000));
+
+  document.getElementById("adCountdown").textContent=remaining;
+
+  if(remaining<=0){
+   clearInterval(gateTimer);
+   gateTimer=null;
+   button.disabled=false;
+   button.textContent="Endelea kusoma";
+  }
+ }
+
+ updateCountdown();
+ gateTimer=setInterval(updateCountdown,250);
+}
+
+// KUFUNGA KIZUIZI NA KUENDELEA
+function continueAfterAd(){
+
+ const gateUntil=Number(localStorage.getItem("mwibaGateUntil") || 0);
+
+ if(Date.now()<gateUntil){
+  return;
+ }
+
+ localStorage.removeItem("mwibaGateActive");
+ localStorage.removeItem("mwibaGateUntil");
+
+ document.getElementById("adGate").style.display="none";
+
+ if(gateTimer){
+  clearInterval(gateTimer);
+  gateTimer=null;
+ }
+
+ const nextId=pendingStoryId;
+ pendingStoryId=null;
+
+ if(nextId){
+  openReader(nextId);
+ }
+}
+
+// KUREJESHA KIZUIZI MTUMIAJI AKIFUNGUA TENA TOVUTI
+function restoreAdGate(){
+
+ if(localStorage.getItem("mwibaGateActive")==="yes"){
+  showAdGate();
+ }
+}
+
+// KUMALIZA EPISODE
+function finishEpisode(){
+
+ if(!currentStoryId)return;
+
+ const status=document.getElementById("finishStatus");
+ const completed=getCompletedEpisodes();
+
+ if(completed.includes(currentStoryId)){
+  status.textContent="Episode hii tayari imeshahesabiwa. Unaweza kuendelea.";
+  return;
+ }
+
+ completed.push(currentStoryId);
+
+ localStorage.setItem(
+  "mwibaCompletedEpisodes",
+  JSON.stringify(completed)
+ );
+
+ const lastGate=getLastGateCount();
+
+ status.textContent="Episode imekamilika. Asante kwa kusoma!";
+
+ if(completed.length-lastGate>=3){
+
+  setLastGateCount(completed.length);
+
+  showAdGate();
+ }
+}
 
 // CLOUDINARY UPLOAD WIDGET
 function createUploadWidget(){
 
- if(typeof cloudinary === "undefined"){
+ if(typeof cloudinary==="undefined"){
   alert("Cloudinary haijapakia. Hakikisha una intaneti kisha jaribu tena.");
   return;
  }
 
- uploadWidget = cloudinary.createUploadWidget({
+ uploadWidget=cloudinary.createUploadWidget({
 
-  cloudName: CLOUD_NAME,
-  uploadPreset: UPLOAD_PRESET,
-  sources: ["local"],
-  defaultSource: "local",
-  multiple: true,
-  maxFiles: 30,
-  resourceType: "image",
-  clientAllowedFormats: ["jpg","jpeg","png","webp"],
-  maxImageFileSize: 10000000,
-  showPoweredBy: false,
-  language: "en"
+  cloudName:CLOUD_NAME,
+  uploadPreset:UPLOAD_PRESET,
+  sources:["local"],
+  defaultSource:"local",
+  multiple:true,
+  maxFiles:30,
+  resourceType:"image",
+  clientAllowedFormats:["jpg","jpeg","png","webp"],
+  maxImageFileSize:10000000,
+  showPoweredBy:false,
+  language:"en"
 
- }, function(error,result){
+ },function(error,result){
 
   if(error){
-   document.getElementById("uploadStatus").textContent =
+   document.getElementById("uploadStatus").textContent=
     "Hitilafu ya kupakia picha: "+(error.message || "Jaribu tena.");
    return;
   }
 
-  if(result && result.event === "upload-added"){
-   uploadInProgress = true;
-   document.getElementById("uploadStatus").textContent =
+  if(result && result.event==="upload-added"){
+   uploadInProgress=true;
+   document.getElementById("uploadStatus").textContent=
     "Picha zinapakiwa... tafadhali subiri.";
   }
 
-  if(result && result.event === "success"){
+  if(result && result.event==="success"){
 
-   const info = result.info;
+   const info=result.info;
 
    if(info && info.secure_url){
     uploadedImages.push({
-     url: info.secure_url,
-     publicId: info.public_id || ""
+     url:info.secure_url,
+     publicId:info.public_id || ""
     });
 
     renderPreviews();
    }
   }
 
-  if(result && result.event === "queues-end"){
-   uploadInProgress = false;
-   document.getElementById("uploadStatus").textContent =
+  if(result && result.event==="queues-end"){
+   uploadInProgress=false;
+   document.getElementById("uploadStatus").textContent=
     "Imekamilika! Picha "+uploadedImages.length+" zimepakiwa.";
   }
 
@@ -300,7 +460,7 @@ function createUploadWidget(){
 
 function openImageUpload(){
 
- if(!auth.currentUser || auth.currentUser.uid !== ADMIN_UID){
+ if(!auth.currentUser || auth.currentUser.uid!==ADMIN_UID){
   alert("Ingia kama Admin kwanza.");
   return;
  }
@@ -316,36 +476,36 @@ function openImageUpload(){
 
 function renderPreviews(){
 
- const grid = document.getElementById("previewGrid");
- grid.innerHTML = "";
+ const grid=document.getElementById("previewGrid");
+ grid.innerHTML="";
 
  uploadedImages.forEach((image,index)=>{
 
-  const item = document.createElement("div");
-  item.className = "preview-item";
+  const item=document.createElement("div");
+  item.className="preview-item";
 
-  const img = document.createElement("img");
-  img.src = image.url;
-  img.alt = "Picha "+(index+1);
+  const img=document.createElement("img");
+  img.src=image.url;
+  img.alt="Picha "+(index+1);
 
-  const remove = document.createElement("button");
-  remove.type = "button";
-  remove.textContent = "×";
-  remove.title = "Ondoa picha kwenye simulizi";
-  remove.onclick = ()=>removeImage(index);
+  const remove=document.createElement("button");
+  remove.type="button";
+  remove.textContent="×";
+  remove.title="Ondoa picha kwenye simulizi";
+  remove.onclick=()=>removeImage(index);
 
-  const number = document.createElement("small");
-  number.textContent = "Picha "+(index+1);
+  const number=document.createElement("small");
+  number.textContent="Picha "+(index+1);
 
   item.append(img,remove,number);
   grid.appendChild(item);
 
  });
 
- document.getElementById("uploadStatus").textContent =
+ document.getElementById("uploadStatus").textContent=
   uploadedImages.length
-   ? "Picha "+uploadedImages.length+" zimechaguliwa."
-   : "Bado hujachagua picha.";
+   ?"Picha "+uploadedImages.length+" zimechaguliwa."
+   :"Bado hujachagua picha.";
 }
 
 function removeImage(index){
@@ -560,9 +720,21 @@ document.getElementById("searchInput")
 // READER
 function openReader(id){
 
+ // Kama kizuizi bado kipo, simamisha kufungua episode
+ const gateActive=localStorage.getItem("mwibaGateActive")==="yes";
+
+ if(gateActive){
+  showAdGate(id);
+  return;
+ }
+
  const story=stories.find(s=>s.id===id);
 
  if(!story)return;
+
+ currentStoryId=id;
+
+ document.getElementById("finishStatus").textContent="";
 
  document.getElementById("readerTitle").textContent=
   story.title || "";
@@ -601,6 +773,7 @@ function openReader(id){
 
 function closeReader(){
  document.getElementById("reader").style.display="none";
+ currentStoryId=null;
 }
 
 // SAVE STORY
@@ -767,6 +940,13 @@ function cancelEditing(){
  document.getElementById("adminStatus").textContent="";
 }
 
+// REJESHA KIZUIZI KAMA KILIKUWEPO
+restoreAdGate();
+
 </script>
+
+<!-- ADSTERRA SOCIAL BAR: WEKA MARA MOJA TU -->
+<script data-cfasync="false" src="https://bicea.org/14/444371dba3fd5f160919b0e758da14b5"></script>
+
 </body>
 </html>
