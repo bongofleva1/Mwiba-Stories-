@@ -189,3 +189,205 @@ label{font-size:13px;color:#ddd}
   <button id="adContinue" disabled onclick="continueAfterAd()">Subiri kidogo...</button>
  </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://upload-widget.cloudinary.com/latest/global/all.js"></script>
+
+<script>
+const firebaseConfig={
+ apiKey:"AIzaSyCXwx1a14XIXsLkUkUgEUYuCJqS9x3uKLs",
+ authDomain:"mwiba-stories.firebaseapp.com",
+ projectId:"mwiba-stories",
+ storageBucket:"mwiba-stories.firebasestorage.app",
+ messagingSenderId:"532859748570",
+ appId:"1:532859748570:web:0243dbce910f16e54525e3"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
+const ADMIN_UID="69WXPvG20zRdrWGKU4KS7CdhD6C2";
+const CLOUD_NAME="kvlhfvmd";
+const UPLOAD_PRESET="mwiba_stories";
+
+let stories=[];
+let editingId=null;
+let currentCategory="zote";
+let currentSearch="";
+let uploadedImages=[];
+let uploadWidget=null;
+let uploadInProgress=false;
+let currentStoryId=null;
+let pendingStoryId=null;
+let gateTimer=null;
+let readingTimer=null;
+let readingStartedAt=0;
+
+const READ_SECONDS=10;
+const EPISODES_PER_GATE=3;
+const GATE_SECONDS=15;
+const READ_KEY="mwibaAutoReadEpisodes_v2";
+const GATE_COUNT_KEY="mwibaAutoGateCount_v2";
+
+function getReadEpisodes(){
+ try{return JSON.parse(localStorage.getItem(READ_KEY)||"[]");}
+ catch(e){return [];}
+}
+
+function saveReadEpisode(id){
+ const read=getReadEpisodes();
+ if(read.includes(id))return false;
+ read.push(id);
+ localStorage.setItem(READ_KEY,JSON.stringify(read));
+ return true;
+}
+
+function getGateCount(){
+ return Number(localStorage.getItem(GATE_COUNT_KEY)||0);
+}
+
+function setGateCount(n){
+ localStorage.setItem(GATE_COUNT_KEY,String(n));
+}
+
+function stopReadingTimer(){
+ if(readingTimer){clearTimeout(readingTimer);readingTimer=null;}
+ readingStartedAt=0;
+}
+
+function startReadingTimer(id){
+ stopReadingTimer();
+
+ if(getReadEpisodes().includes(id)){
+  document.getElementById("readingStatus").textContent="Episode hii tayari imeshahesabiwa kwenye kifaa hiki.";
+  return;
+ }
+
+ readingStartedAt=Date.now();
+ document.getElementById("readingStatus").textContent="Inahesabiwa baada ya sekunde 10 za kusoma...";
+
+ readingTimer=setTimeout(()=>{
+  if(currentStoryId!==id || document.getElementById("reader").style.display==="none" || document.visibilityState!=="visible")return;
+
+  const added=saveReadEpisode(id);
+  readingTimer=null;
+  if(!added)return;
+
+  document.getElementById("readingStatus").textContent="Episode imehesabiwa. Asante kwa kusoma!";
+
+  const total=getReadEpisodes().length;
+  const lastGate=getGateCount();
+
+  if(total-lastGate>=EPISODES_PER_GATE){
+   setGateCount(total);
+   showAdGate();
+  }
+ },READ_SECONDS*1000);
+}
+
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState!=="visible")stopReadingTimer();
+ else if(currentStoryId && document.getElementById("reader").style.display!=="none")startReadingTimer(currentStoryId);
+});
+
+function showAdGate(nextStoryId=null){
+ if(nextStoryId)pendingStoryId=nextStoryId;
+
+ const gate=document.getElementById("adGate");
+ const button=document.getElementById("adContinue");
+
+ let until=Number(localStorage.getItem("mwibaGateUntil")||0);
+
+ if(!until || until<Date.now()){
+  until=Date.now()+GATE_SECONDS*1000;
+  localStorage.setItem("mwibaGateUntil",String(until));
+ }
+
+ localStorage.setItem("mwibaGateActive","yes");
+ gate.style.display="flex";
+ button.disabled=true;
+ button.textContent="Subiri kidogo...";
+
+ if(gateTimer)clearInterval(gateTimer);
+
+ function update(){
+  const remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
+  document.getElementById("adCountdown").textContent=remaining;
+
+  if(remaining<=0){
+   clearInterval(gateTimer);
+   gateTimer=null;
+   button.disabled=false;
+   button.textContent="Endelea kusoma";
+  }
+ }
+
+ update();
+ gateTimer=setInterval(update,250);
+}
+
+function continueAfterAd(){
+ const until=Number(localStorage.getItem("mwibaGateUntil")||0);
+ if(Date.now()<until)return;
+
+ localStorage.removeItem("mwibaGateActive");
+ localStorage.removeItem("mwibaGateUntil");
+
+ document.getElementById("adGate").style.display="none";
+
+ if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
+
+ const next=pendingStoryId;
+ pendingStoryId=null;
+
+ if(next)openReader(next);
+}
+
+function restoreAdGate(){
+ if(localStorage.getItem("mwibaGateActive")==="yes")showAdGate();
+}
+
+function createUploadWidget(){
+ if(typeof cloudinary==="undefined"){
+  alert("Cloudinary haijapakia. Hakikisha una intaneti kisha jaribu tena.");
+  return;
+ }
+
+ uploadWidget=cloudinary.createUploadWidget({
+  cloudName:CLOUD_NAME,
+  uploadPreset:UPLOAD_PRESET,
+  sources:["local"],
+  defaultSource:"local",
+  multiple:true,
+  maxFiles:30,
+  resourceType:"image",
+  clientAllowedFormats:["jpg","jpeg","png","webp"],
+  maxImageFileSize:10000000,
+  showPoweredBy:false,
+  language:"en"
+ },function(error,result){
+
+  if(error){
+   document.getElementById("uploadStatus").textContent="Hitilafu ya kupakia picha: "+(error.message||"Jaribu tena.");
+   return;
+  }
+
+  if(result&&result.event==="upload-added"){
+   uploadInProgress=true;
+   document.getElementById("uploadStatus").textContent="Picha zinapakiwa... tafadhali subiri.";
+  }
+
+  if(result&&result.event==="success"){
+   const info=result.info;
+   if(info&&info.secure_url){
+    uploadedImages.push({url:info.secure_url,publicId:info.public_id||""});
+    renderPreviews();
+   }
+  }
+
+  if(result&&result.event==="queues-end"){
+   uploadInProgress=false;
+   document.getElementById("uploadStatus").textContent="Imekamilika! Picha "+uploadedImages.length+" zimepakiwa.";
+  }
+ });
+}
