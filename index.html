@@ -391,3 +391,196 @@ function createUploadWidget(){
   }
  });
 }
+function openImageUpload(){
+ if(!auth.currentUser||auth.currentUser.uid!==ADMIN_UID){
+  alert("Ingia kama Admin kwanza.");
+  return;
+ }
+
+ if(!uploadWidget)createUploadWidget();
+ if(uploadWidget)uploadWidget.open();
+}
+
+function renderPreviews(){
+ const grid=document.getElementById("previewGrid");
+ grid.innerHTML="";
+
+ uploadedImages.forEach((image,index)=>{
+  const item=document.createElement("div");
+  item.className="preview-item";
+
+  const img=document.createElement("img");
+  img.src=image.url;
+  img.alt="Picha "+(index+1);
+
+  const remove=document.createElement("button");
+  remove.type="button";
+  remove.textContent="×";
+  remove.title="Ondoa picha kwenye simulizi";
+  remove.onclick=()=>removeImage(index);
+
+  const number=document.createElement("small");
+  number.textContent="Picha "+(index+1);
+
+  item.append(img,remove,number);
+  grid.appendChild(item);
+ });
+
+ document.getElementById("uploadStatus").textContent=uploadedImages.length?"Picha "+uploadedImages.length+" zimechaguliwa.":"Bado hujachagua picha.";
+}
+
+function removeImage(index){
+ uploadedImages.splice(index,1);
+ renderPreviews();
+}
+
+function showLogin(){
+ document.getElementById("loginPanel").classList.remove("hidden");
+ document.getElementById("loginPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function hideLogin(){
+ document.getElementById("loginPanel").classList.add("hidden");
+}
+
+function goHome(){
+ closeReader();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function loginAdmin(){
+ const email=document.getElementById("adminEmail").value.trim();
+ const password=document.getElementById("adminPassword").value;
+ const status=document.getElementById("loginStatus");
+
+ if(!email||!password){
+  status.textContent="Jaza email na password.";
+  return;
+ }
+
+ auth.signInWithEmailAndPassword(email,password)
+ .then(()=>{
+  status.textContent="Umeingia kikamilifu.";
+ })
+ .catch(error=>{
+  status.textContent="Imeshindikana kuingia: "+error.message;
+ });
+}
+
+function logoutAdmin(){
+ auth.signOut();
+ cancelEditing();
+}
+
+auth.onAuthStateChanged(user=>{
+ const isAdmin=user&&user.uid===ADMIN_UID;
+
+ document.getElementById("adminPanel").classList.toggle("hidden",!isAdmin);
+ document.getElementById("loginPanel").classList.add("hidden");
+
+ if(user&&!isAdmin){
+  auth.signOut();
+  document.getElementById("loginStatus").textContent="Akaunti hii haina ruhusa ya Admin.";
+ }
+});
+
+db.collection("stories").orderBy("createdAt","desc").onSnapshot(snapshot=>{
+ stories=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+ renderStories();
+},error=>{
+ document.getElementById("emptyMessage").style.display="block";
+ document.getElementById("emptyMessage").textContent="Imeshindikana kupakia simulizi. "+error.message;
+});
+
+function getStoryImages(story){
+ if(Array.isArray(story.images)&&story.images.length)return story.images;
+ if(story.imageUrl)return [{url:story.imageUrl,publicId:""}];
+ return [];
+}
+
+function renderStories(){
+ const container=document.getElementById("storiesContainer");
+ container.innerHTML="";
+
+ const filtered=stories.filter(story=>{
+  const categoryOK=currentCategory==="zote"||story.category===currentCategory;
+  const searchText=((story.title||"")+" "+(story.description||"")).toLowerCase();
+  return categoryOK&&searchText.includes(currentSearch);
+ });
+
+ filtered.forEach(story=>{
+  const article=document.createElement("article");
+  article.className="story";
+
+  const cover=document.createElement("div");
+  cover.className="cover";
+
+  const images=getStoryImages(story);
+
+  if(images.length){
+   const img=document.createElement("img");
+   img.src=images[0].url;
+   img.alt=story.title||"Picha ya simulizi";
+   img.onerror=()=>{
+    img.remove();
+    cover.textContent="MWIBA";
+   };
+   cover.appendChild(img);
+  }else{
+   cover.textContent="MWIBA";
+  }
+
+  const content=document.createElement("div");
+  content.className="story-content";
+
+  const title=document.createElement("h3");
+  title.textContent=story.title||"Simulizi";
+
+  const description=document.createElement("p");
+  description.textContent=story.description||"";
+
+  const read=document.createElement("button");
+  read.className="read";
+  read.textContent="Soma story ("+images.length+" picha)";
+  read.onclick=()=>openReader(story.id);
+
+  content.append(title,description,read);
+
+  if(auth.currentUser&&auth.currentUser.uid===ADMIN_UID){
+   const actions=document.createElement("div");
+   actions.className="admin-actions";
+
+   const edit=document.createElement("button");
+   edit.className="secondary";
+   edit.textContent="Hariri";
+   edit.onclick=()=>editStory(story.id);
+
+   const del=document.createElement("button");
+   del.className="danger";
+   del.textContent="Futa";
+   del.onclick=()=>deleteStory(story.id);
+
+   actions.append(edit,del);
+   content.appendChild(actions);
+  }
+
+  article.append(cover,content);
+  container.appendChild(article);
+ });
+
+ document.getElementById("emptyMessage").style.display=filtered.length?"none":"block";
+}
+
+function filterStories(category,button){
+ currentCategory=category;
+ document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+ renderStories();
+}
+
+function searchStories(){
+ currentSearch=document.getElementById("searchInput").value.trim().toLowerCase();
+ renderStories();
+}
+
+document.getElementById("searchInput").addEventListener("input",searchStories);
