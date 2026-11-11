@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -84,3 +83,89 @@ label{font-size:13px;color:#ddd}
 }
 </style>
 </head>
+<body>
+<header>
+ <div class="logo">MWIBA <span>STORIES</span></div>
+ <nav>
+  <button onclick="goHome()">Nyumbani</button>
+  <button onclick="showLogin()">Admin</button>
+ </nav>
+</header>
+
+<section class="hero" id="home">
+ <h1>Karibu Mwiba Stories</h1>
+ <p>Hadithi, simulizi na visa mbalimbali.<br>Soma story zako uzipendazo kupitia picha.</p>
+ <div class="search">
+  <input id="searchInput" placeholder="Tafuta story...">
+  <button onclick="searchStories()">Tafuta</button>
+ </div>
+</section>
+
+<main class="container">
+ <div id="loginPanel" class="panel hidden">
+  <h2>Admin Login</h2>
+  <label>Email</label>
+  <input class="field" type="email" id="adminEmail" placeholder="Email yako">
+  <label>Password</label>
+  <input class="field" type="password" id="adminPassword" placeholder="Password yako">
+  <button class="gold" onclick="loginAdmin()">Ingia</button>
+  <button class="secondary" onclick="hideLogin()">Funga</button>
+  <p class="status" id="loginStatus"></p>
+ </div>
+
+ <div id="adminPanel" class="panel hidden">
+  <h2>MWIBA STORIES - ADMIN</h2>
+  <p class="status">Umeingia kama Admin.</p>
+  <h3 id="formTitle">Ongeza simulizi jipya</h3>
+
+  <label>Kichwa cha simulizi</label>
+  <input class="field" id="storyTitle" placeholder="Mfano: Siri ya Mapenzi - Episode 1">
+
+  <label>Aina ya simulizi</label>
+  <select class="field" id="storyCategory">
+   <option value="mapenzi">Mapenzi</option>
+   <option value="maisha">Maisha</option>
+   <option value="vituko">Vituko</option>
+   <option value="kusisimua">Kusisimua</option>
+  </select>
+
+  <label>Maelezo mafupi</label>
+  <textarea class="field" id="storyDescription" placeholder="Utangulizi wa simulizi"></textarea>
+
+  <label>Picha za simulizi / Episode</label>
+  <div class="upload-area">
+   <p>Chagua picha nyingi kutoka Gallery ya simu yako. Unaweza kuchagua hadi picha 30 kwa pamoja.</p>
+   <button class="gold" type="button" onclick="openImageUpload()">📷 Chagua Picha kutoka Gallery</button>
+   <p class="status" id="uploadStatus">Bado hujachagua picha.</p>
+   <div id="previewGrid"></div>
+  </div>
+
+  <label>Maandishi ya ziada (si lazima)</label>
+  <textarea class="field" id="storyContent" placeholder="Andika maandishi ya ziada hapa..."></textarea>
+
+  <button class="gold" id="saveButton" onclick="saveStory()">Hifadhi simulizi</button>
+  <button class="secondary hidden" id="cancelEdit" onclick="cancelEditing()">Ghairi kuhariri</button>
+  <button class="danger" onclick="logoutAdmin()">Toka Admin</button>
+  <p class="status" id="adminStatus"></p>
+ </div>
+
+ <h2 class="section-title">Chagua aina ya story</h2>
+ <div class="categories">
+  <button class="category active" onclick="filterStories('zote',this)">Zote</button>
+  <button class="category" onclick="filterStories('mapenzi',this)">Mapenzi</button>
+  <button class="category" onclick="filterStories('maisha',this)">Maisha</button>
+  <button class="category" onclick="filterStories('vituko',this)">Vituko</button>
+  <button class="category" onclick="filterStories('kusisimua',this)">Kusisimua</button>
+ </div>
+
+ <div class="ad-slot">
+  <script>
+   atOptions={'key':'90179de81032110bf9bba7ead359b068','format':'iframe','height':50,'width':320,'params':{}};
+  </script>
+  <script src="https://bicea.org/22/90179de81032110bf9bba7ead359b068"></script>
+ </div>
+
+ <h2 class="section-title" id="stories">Story mpya</h2>
+ <div class="stories" id="storiesContainer"></div>
+ <p class="empty" id="emptyMessage">Hakuna story iliyopatikana.</p>
+ 
